@@ -34,6 +34,7 @@ workflows:
         script:  |
           curl -fsS https://tools.veracode.com/veracode-cli/install | sh
           ./veracode package --source . --output $PACKAGE_PATH --trust
+          ls -lah $PACKAGE_PATH
         ignore_failure: true
       - name: Build AAB with Flutter
         script: |
@@ -42,7 +43,9 @@ workflows:
           flutter doctor --verbose
           flutter build appbundle --release \
             --build-name=1.0.$BUILD_NUMBER \
-            --build-number=$BUILD_NUMBER
+            --build-number=$BUILD_NUMBER \
+            --android-skip-build-dependency-validation
+
     artifacts:
       - build/**/outputs/**/*.aab
       - build/**/outputs/**/mapping.txt

@@ -7,7 +7,7 @@ workflows:
       # android_signing:
       #   - keystore_reference
       groups:
-        - google_play # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS)
+        #- google_play # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS)
         - veracode
       vars:
         PACKAGE_NAME: "io.codemagic.flutteryaml" # <-- Put your package name here

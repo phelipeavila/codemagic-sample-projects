@@ -26,6 +26,10 @@ workflows:
       - name: Flutter analyze
         script: |
           flutter analyze
+      - name: Flutter doctor
+        script: |
+          flutter doctor --verbose
+        ignore_failure: true
       - name: Flutter unit tests
         script: |
           flutter test
@@ -40,11 +44,11 @@ workflows:
         script: |
           # BUILD_NUMBER=$(($(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK") + 1))      
           BUILD_NUMBER=1
-          flutter doctor --verbose
-          flutter build appbundle --release \
-            --build-name=1.0.$BUILD_NUMBER \
-            --build-number=$BUILD_NUMBER \
-            --android-skip-build-dependency-validation
+          flutter build apk --debug
+          # flutter build appbundle --release \
+          #   --build-name=1.0.$BUILD_NUMBER \
+          #   --build-number=$BUILD_NUMBER \
+          #   --android-skip-build-dependency-validation
 
     artifacts:
       - build/**/outputs/**/*.aab

@@ -7,10 +7,15 @@ workflows:
       android_signing:
         - keystore_reference
       groups:
-        - google_play # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS)
+        #- google_play # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS)
+        - veracode
       vars:
         PACKAGE_NAME: "io.codemagic.flutteryaml" # <-- Put your package name here
         GOOGLE_PLAY_TRACK: "alpha"
+        VERACODE_API_KEY_ID: $VID
+        VERACODE_API_KEY_SECRET: $VKEY
+        SRCCLR: $SRCCLR
+        package_path: ".verascan"
       flutter: stable
     scripts:
       - name: Set up local.properties
@@ -25,10 +30,19 @@ workflows:
       - name: Flutter unit tests
         script: |
           flutter test
+      - name: Flutter doctor
+        script: |
+          flutter doctor
+      - name: Veracode package
+        script: |
+          curl -fsS https://tools.veracode.com/veracode-cli/install | sh
+          ./veracode package --source . --output $package_path --trust
+          ls -lah $package_path
         ignore_failure: true
       - name: Build AAB with Flutter
         script: |
-          BUILD_NUMBER=$(($(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK") + 1))      
+          #BUILD_NUMBER=$(($(google-play get-latest-build-number --package-name "$PACKAGE_NAME" --tracks="$GOOGLE_PLAY_TRACK") + 1))      
+          BUILD_NUMBER=1
           flutter build appbundle --release \
             --build-name=1.0.$BUILD_NUMBER \
             --build-number=$BUILD_NUMBER
@@ -36,18 +50,18 @@ workflows:
       - build/**/outputs/**/*.aab
       - build/**/outputs/**/mapping.txt
       - flutter_drive.log
-    publishing:
-      email:
-        recipients:
-          - user_1@example.com
-          - user_2@example.com
-        notify:
-          success: true
-          failure: false
-      google_play:
-        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
-        track: $GOOGLE_PLAY_TRACK
-        submit_as_draft: true
+    # publishing:
+    #   email:
+    #     recipients:
+    #       - user_1@example.com
+    #       - user_2@example.com
+    #     notify:
+    #       success: true
+    #       failure: false
+    #   google_play:
+    #     credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+    #     track: $GOOGLE_PLAY_TRACK
+    #     submit_as_draft: true
   ios-workflow:
     name: iOS Workflow
     instance_type: mac_mini_m1
